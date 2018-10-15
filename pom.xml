@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>top.simba1949</groupId>
+    <artifactId>Microservice-Docker</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.0.5.RELEASE</version>
+    </parent>
+
+    <properties>
+        <java.version>1.8</java.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>Microservice-Docker</finalName>
+        <plugins>
+            <!--编译插件-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <!-- 配置使用的 jdk 版本 -->
+                    <target>1.8</target>
+                    <source>1.8</source>
+                </configuration>
+            </plugin>
+            <!--springboot-maven打包插件-->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <!--资源拷贝插件-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <!-- docker的maven插件，
+            maven 地址：https://mvnrepository.com/artifact/com.spotify/docker-maven-plugin
+            官网：https://github.com/spotify/docker-maven-plugin -->
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <configuration>
+                    <!--提交到私有仓库地址-->
+                    <registryUrl>123.207.4.93:5000</registryUrl>
+                    <pushImage>true</pushImage>
+                    <!--生成的镜像名称,123.207.4.93:5000表示仓库地址，
+                        mir-docker表示镜像名，
+                        1.0.0表示镜像版本，如果不指定，docker有该镜像名，版本号自动更替，没有版本号为latest-->
+                    <imageName>123.207.4.93:5000/mir-docker</imageName>
+                    <!--基础镜像,相当于 Dockerfile 中的 from-->
+                    <baseImage>java</baseImage>
+                    <!--入口点，容器启动时自动执行的命令-->
+                    <entryPoint>["java", "-jar", "/${project.build.finalName}.jar"]</entryPoint>
+                    <resources>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${project.build.directory}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
+                    <!--指定宿主机地址-->
+                    <dockerHost>http://123.207.4.93:2375</dockerHost>
+                </configuration>
+            </plugin>
+        </plugins>
+        <!--IDEA是不会编译src的java目录的xml文件，如果需要读取，则需要手动指定哪些配置文件需要读取-->
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
+</project>
